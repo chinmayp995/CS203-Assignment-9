@@ -3,7 +3,7 @@ from kfp import dsl
 
 @dsl.pipeline(name="breast-cancer-ci-pipeline")
 def pipeline(model_name="rf_model"):
-    # Step 1: Load data
+    #loading the data  
     ingest = mlrun.run_function(
         "data-prep",
         name="data-loader",
@@ -11,7 +11,7 @@ def pipeline(model_name="rf_model"):
         outputs=["dataset"]
     )
 
-    # Step 2: Train with hyperparams
+    # we now use the lists of different hyperparamters whch will be deployed
     train = mlrun.run_function(
         "trainer",
         inputs={"dataset": ingest.outputs["dataset"]},
@@ -22,8 +22,7 @@ def pipeline(model_name="rf_model"):
         selector="max.accuracy",
         outputs=["model"]
     )
-
-    # Step 3: Deploy
+    
     mlrun.deploy_function(
         "serving",
         models=[{
